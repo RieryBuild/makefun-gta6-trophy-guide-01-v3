@@ -1,84 +1,83 @@
-// Vice Ledger progress store: earned flags in localStorage, plus export / import / reset.
-export const STORAGE_KEY = 'vice-ledger-progress-v3';
-export const SPOILER_KEY = 'vice-ledger-spoiler-v3';
-export const THEME_KEY = 'vice-ledger-theme-v3';
+// Progress store: localStorage for earned trophies, theme and the
+// spoiler setting, plus JSON export, import and reset. Everything the
+// app remembers lives under these three keys and nowhere else.
 
-export function loadEarned() {
+const PROGRESS_KEY = "vice-ledger-progress-v1";
+const THEME_KEY = "vice-ledger-theme-v1";
+const SPOILER_KEY = "vice-ledger-spoiler-v1";
+
+function validId(id) {
+  return Number.isInteger(id) && id >= 1 && id <= 55;
+}
+
+export function loadProgress() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(PROGRESS_KEY);
     if (!raw) return new Set();
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return new Set();
-    return new Set(parsed.filter((id) => typeof id === 'string'));
-  } catch (err) {
+    const ids = Array.isArray(parsed) ? parsed : parsed.earned;
+    if (!Array.isArray(ids)) return new Set();
+    return new Set(ids.filter(validId));
+  } catch {
     return new Set();
   }
 }
 
-export function saveEarned(earned) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([...earned].sort()));
-  } catch (err) {
-    // Storage full or blocked: progress still lives in memory for this session.
-  }
+export function saveProgress(earned) {
+  const ids = [...earned].filter(validId).sort((a, b) => a - b);
+  localStorage.setItem(PROGRESS_KEY, JSON.stringify(ids));
 }
 
-export function loadSpoilerSetting() {
-  try {
-    return localStorage.getItem(SPOILER_KEY) === 'on';
-  } catch (err) {
-    return false;
-  }
+export function loadTheme() {
+  return localStorage.getItem(THEME_KEY) === "night" ? "night" : "paper";
 }
 
-export function saveSpoilerSetting(on) {
-  try {
-    localStorage.setItem(SPOILER_KEY, on ? 'on' : 'off');
-  } catch (err) { /* ignore */ }
+export function saveTheme(theme) {
+  localStorage.setItem(THEME_KEY, theme);
 }
 
-export function loadThemeSetting() {
-  try {
-    return localStorage.getItem(THEME_KEY) || 'paper';
-  } catch (err) {
-    return 'paper';
-  }
+export function loadSpoiler() {
+  return localStorage.getItem(SPOILER_KEY) === "on";
 }
 
-export function saveThemeSetting(theme) {
-  try {
-    localStorage.setItem(THEME_KEY, theme);
-  } catch (err) { /* ignore */ }
+export function saveSpoiler(on) {
+  localStorage.setItem(SPOILER_KEY, on ? "on" : "off");
 }
 
-// Serialises earned progress for export; import validates the shape first.
-export function exportProgressJson(earned, total) {
-  return JSON.stringify({ app: 'Vice Ledger', version: 3, total, earned: [...earned].sort(), exported: new Date().toISOString() }, null, 2);
+export function exportProgressJson(earned) {
+  const ids = [...earned].filter(validId).sort((a, b) => a - b);
+  return JSON.stringify(
+    { app: "vice-ledger", version: 1, earned: ids, exportedAt: new Date().toISOString() },
+    null,
+    2,
+  );
 }
 
-export function parseProgressImport(text, knownIds) {
-  let parsed;
-  try {
-    parsed = JSON.parse(text);
-  } catch (err) {
-    throw new Error('That file is not valid JSON.');
-  }
-  const ids = Array.isArray(parsed) ? parsed : parsed.earned;
-  if (!Array.isArray(ids)) throw new Error('No earned list found in that file.');
-  const known = new Set(knownIds);
-  const clean = ids.filter((id) => typeof id === 'string' && known.has(id));
-  if (clean.length === 0 && ids.length > 0) throw new Error('No trophy ids in that file match this guide.');
-  return new Set(clean);
-}
-
-export function downloadTextFile(filename, text) {
-  const blob = new Blob([text], { type: 'application/json' });
+export function downloadProgress(earned) {
+  const blob = new Blob([exportProgressJson(earned)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
+  const link = document.createElement("a");
   link.href = url;
-  link.download = filename;
+  link.download = "vice-ledger-progress.json";
   document.body.appendChild(link);
   link.click();
   link.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  URL.revokeObjectURL(url);
+}
+
+// Parses an imported progress file. Throws a plain message on bad input.
+export function parseImportedProgress(text) {
+  let parsed;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    throw new Error("That file is not valid JSON.");
+  }
+  const ids = Array.isArray(parsed) ? parsed : parsed.earned;
+  if (!Array.isArray(ids)) throw new Error("That file holds no earned list.");
+  const kept = ids.filter(validId);
+  if (kept.length === 0 && ids.length > 0) {
+    throw new Error("That file holds no trophy ids between 1 and 55.");
+  }
+  return new Set(kept);
 }
