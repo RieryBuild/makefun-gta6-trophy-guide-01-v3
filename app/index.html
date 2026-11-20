@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vice Ledger — GTA VI Trophy Guide &amp; Tracker</title>
+<meta name="description" content="Vice Ledger: an offline guide and tracker for all 55 Grand Theft Auto VI trophies on PlayStation 5 — every guide in our own words, every fact dated and cited.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="paper">
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">VL</div>
+      <div>
+        <h1>VICE LEDGER</h1>
+        <p class="tagline">GTA VI trophy guide &amp; tracker — all 55 trophies, every guide cited, works offline.</p>
+      </div>
+    </div>
+    <div class="masthead-stats" id="mastheadStats" aria-label="Collection totals"></div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-line"><span id="progressText">Loading…</span><span id="progressCounts"></span></div>
+    <div class="progress-bar" role="progressbar" aria-label="Trophies earned" aria-valuemin="0" aria-valuemax="55" aria-valuenow="0" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+  <nav class="tabs" aria-label="Guide sections">
+    <a href="#checklist" data-tab="checklist" id="tab-checklist">Checklist</a>
+    <a href="#roadmap" data-tab="roadmap" id="tab-roadmap">Roadmap</a>
+    <a href="#missables" data-tab="missables" id="tab-missables">Missables <span class="tab-badge">9</span></a>
+    <a href="#sources" data-tab="sources" id="tab-sources">Sources &amp; Audit</a>
+  </nav>
+  <p class="audit-strip" id="auditStrip"></p>
+</header>
+<main id="main">
+  <section id="view-checklist" class="view" aria-label="Trophy checklist">
+    <div class="checklist-layout">
+      <div class="list-col">
+        <div class="controls" role="group" aria-label="Filters">
+          <input type="search" id="searchInput" placeholder="Search trophies…" aria-label="Search trophies">
+          <div class="chip-row" id="kindChips" role="group" aria-label="Filter by kind"></div>
+          <div class="control-row">
+            <label>Grade
+              <select id="gradeSelect" aria-label="Filter by grade">
+                <option value="all">All grades</option>
+                <option value="platinum">Platinum</option>
+                <option value="gold">Gold</option>
+                <option value="silver">Silver</option>
+                <option value="bronze">Bronze</option>
+              </select>
+            </label>
+            <label class="check-label"><input type="checkbox" id="hideEarned"> Hide earned</label>
+            <label class="check-label spoiler-label"><input type="checkbox" id="spoilerToggle"> Spoiler-safe: hide story trophies</label>
+            <button type="button" id="themeToggle" class="btn btn-small">Night theme</button>
+          </div>
+        </div>
+        <p class="list-note" id="listNote"></p>
+        <div class="data-tools data-tools-inline">
+          <button type="button" id="exportBtnTop" class="btn btn-small">Export progress (.json)</button>
+          <label class="btn btn-small btn-file">Import progress<input type="file" id="importFileTop" accept="application/json,.json" hidden></label>
+          <button type="button" id="resetBtnTop" class="btn btn-small btn-danger">Reset progress</button>
+          <span class="data-note" id="dataNoteTop">Saved in this browser (localStorage).</span>
+        </div>
+        <ul class="trophy-list" id="trophyList"></ul>
+        <p class="empty-note" id="emptyNote" hidden>No trophies match these filters.</p>
+      </div>
+      <aside class="guide-col" aria-label="Trophy guide">
+        <div id="guidePane"></div>
+      </aside>
+    </div>
+  </section>
+  <section id="view-roadmap" class="view" aria-label="Platinum roadmap" hidden>
+    <p class="audit-strip" data-audit></p>
+    <h2>Roadmap to the platinum — 5 phases, all 55 trophies</h2>
+    <p class="view-intro">Follow the phases in order. Every trophy appears once, with the fact that decides how to earn it. Save at every phase boundary — the finale is flagged as a point of no return.</p>
+    <div id="roadmapPhases"></div>
+  </section>
+  <section id="view-missables" class="view" aria-label="Missable trophies" hidden>
+    <p class="audit-strip" data-audit></p>
+    <h2>Missable trophies — 9 to catch before they close</h2>
+    <p class="view-intro">Do these on time. The rule for all nine: keep a manual save before you attempt them, and never leave a partner trophy for the endgame — partners may not be available late in the story.</p>
+    <div id="missableCards" class="missable-grid"></div>
+  </section>
+  <section id="view-sources" class="view" aria-label="Sources and audit" hidden>
+    <p class="audit-strip" data-audit></p>
+    <h2>Sources &amp; audit — where every fact comes from</h2>
+    <p class="view-intro">Every specific claim in this guide carries a dated source. The two trophy lists agree on every name, description and grade. Where we infer something from a description, we say so — an inference is never dressed up as a verified fact.</p>
+    <h3>Source matrix</h3>
+    <div class="table-wrap"><table id="sourceMatrix" class="matrix">
+      <thead><tr><th>Source</th><th>Date</th><th>What it covers</th><th>Trophies citing it</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+    <h3>How we stay honest</h3>
+    <ul class="honest-list" id="honestList"></ul>
+    <h3>Your progress</h3>
+    <div class="data-tools">
+      <button type="button" id="exportBtn" class="btn">Export progress (.json)</button>
+      <label class="btn btn-file">Import progress<input type="file" id="importFile" accept="application/json,.json" hidden></label>
+      <button type="button" id="resetBtn" class="btn btn-danger">Reset progress</button>
+      <span class="data-note" id="dataNote">Progress is saved in this browser only (localStorage). Export keeps a copy you can import back.</span>
+    </div>
+  </section>
+</main>
+<footer class="footer">
+  <p>Vice Ledger — an unofficial fan guide. Grand Theft Auto and GTA are trademarks of Rockstar Games; this guide uses no Rockstar logo, artwork or copied text. Trophy names and descriptions are shown as PlayStation publishes them; every guide is written in our own words. Lists as of 18 Nov 2026; guide updated 20 Nov 2026. Works fully offline — it loads no network resource at run time.</p>
+  <p class="footer-audit" data-audit></p>
+</footer>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
